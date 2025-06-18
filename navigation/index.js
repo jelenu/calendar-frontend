@@ -1,19 +1,19 @@
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer'; // Cambia aquí
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import CalendarScreen from '../screens/calendar/CalendarScreen';
 
 import { AuthContext } from '../contexts/AuthContext';
 
-const AuthStack = createNativeStackNavigator(); // Stack navigator for authentication screens
-const AppStack = createBottomTabNavigator(); // Tab navigator for main app screens
+const AuthStack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator(); // Cambia aquí
 
 function AuthStackScreen() {
-  // Authentication stack with Login and Register screens, header hidden
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Login" component={LoginScreen} />
@@ -22,21 +22,21 @@ function AuthStackScreen() {
   );
 }
 
-function AppStackScreen() {
-  // Main app stack with the Profile screen as a tab, header hidden
+function AppDrawerScreen() { // Cambia el nombre aquí
   return (
-    <AppStack.Navigator screenOptions={{ headerShown: false }}>
-      <AppStack.Screen name="Profile" component={ProfileScreen} />
-    </AppStack.Navigator>
+    <Drawer.Navigator>
+      <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="Calendar" component={CalendarScreen} />
+    </Drawer.Navigator>
   );
 }
 
 export default function RootNavigation() {
-  const { accessToken } = useContext(AuthContext); // Get accessToken from AuthContext
+  const { accessToken } = useContext(AuthContext);
 
   return (
     <NavigationContainer>
-      {accessToken ? <AppStackScreen /> : <AuthStackScreen />}
+      {accessToken ? <AppDrawerScreen /> : <AuthStackScreen />}
     </NavigationContainer>
   );
 }

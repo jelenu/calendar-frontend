@@ -41,6 +41,11 @@ async function refreshAccessToken(refreshToken) {
 export async function authFetch(url, options = {}, logout) {
   let { access, refresh } = await getTokens();
   let response;
+  let data;  
+
+  if (options.body && typeof options.body === 'object') {
+    options.body = JSON.stringify(options.body);
+  }
 
   // Attach Authorization header
   options.headers = {
@@ -49,14 +54,16 @@ export async function authFetch(url, options = {}, logout) {
     'Content-Type': options.headers?.['Content-Type'] || 'application/json',
   };
 
-  response = await fetch(url, options);
+  response = await fetch(`${Config.BACKEND_URL}${url}`, options);
+  data = await response.json();
 
   // If token expired, try to refresh and retry once
   if (response.status === 401 && refresh) {
     try {
       access = await refreshAccessToken(refresh);
       options.headers.Authorization = `Bearer ${access}`;
-      response = await fetch(url, options);
+      response = await fetch(`${Config.BACKEND_URL}${url}`, options);
+      data = await response.json();
     } catch (e) {
       // If refresh fails, logout user
       if (logout) await logout();
@@ -65,5 +72,5 @@ export async function authFetch(url, options = {}, logout) {
     }
   }
 
-  return response;
+  return data;
 }

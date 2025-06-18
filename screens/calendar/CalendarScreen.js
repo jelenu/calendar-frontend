@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { authFetch } from '../../utils/api';
 import { Calendar } from 'react-native-big-calendar';
-import CreateEventModal from '../../components/CreateEventModal';
+import CreateEventModal from '../../components/event/CreateEventModal';
 
 const CalendarScreen = () => {
   const [events, setEvents] = useState([]);

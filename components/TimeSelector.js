@@ -1,0 +1,22 @@
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { formatTime } from "../utils/dateHelpers";
+import styles from "../styles/common"; // or import your styles directly
+
+const TimeSelector = ({ label, value, onPress, disabled }) => (
+  <View style={{ flex: 1, marginHorizontal: 4 }}>
+    <Text style={styles.label}>{label}</Text>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.dateButton,
+        { opacity: disabled ? 0.5 : 1 },
+      ]}
+      disabled={disabled}
+    >
+      <Text style={styles.dateButtonText}>{disabled ? "No time" : formatTime(value)}</Text>
+    </TouchableOpacity>
+  </View>
+);
+
+export default TimeSelector;

@@ -41,13 +41,11 @@ async function refreshAccessToken(refreshToken) {
 export async function authFetch(url, options = {}, logout) {
   let { access, refresh } = await getTokens();
   let response;
-  let data;  
 
   if (options.body && typeof options.body === 'object') {
     options.body = JSON.stringify(options.body);
   }
 
-  // Attach Authorization header
   options.headers = {
     ...(options.headers || {}),
     Authorization: `Bearer ${access}`,
@@ -55,7 +53,6 @@ export async function authFetch(url, options = {}, logout) {
   };
 
   response = await fetch(`${Config.BACKEND_URL}${url}`, options);
-  data = await response.json();
 
   // If token expired, try to refresh and retry once
   if (response.status === 401 && refresh) {
@@ -63,13 +60,25 @@ export async function authFetch(url, options = {}, logout) {
       access = await refreshAccessToken(refresh);
       options.headers.Authorization = `Bearer ${access}`;
       response = await fetch(`${Config.BACKEND_URL}${url}`, options);
-      data = await response.json();
     } catch (e) {
-      // If refresh fails, logout user
       if (logout) await logout();
       await removeTokens();
       throw new Error('Session expired. Please log in again.');
     }
+  }
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    // Try to get error message from response
+    console.log('API Error:', data);
+    const errorMsg =
+      data?.detail ||
+      data?.message ||
+      (Array.isArray(data?.non_field_errors) ? data.non_field_errors.join(', ') : undefined) ||
+      'Unknown error';
+    throw new Error(errorMsg);
   }
 
   return data;

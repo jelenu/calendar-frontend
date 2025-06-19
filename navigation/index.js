@@ -22,7 +22,7 @@ function AuthStackScreen() {
   );
 }
 
-function AppDrawerScreen() { // Cambia el nombre aquí
+function AppDrawerScreen() {
   return (
     <Drawer.Navigator>
       <Drawer.Screen name="Profile" component={ProfileScreen} />

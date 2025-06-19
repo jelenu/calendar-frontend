@@ -34,11 +34,12 @@ async function refreshAccessToken(refreshToken) {
       return data.access;
     }
   }
+  await removeTokens();
   throw new Error('Unable to refresh token');
 }
 
 // Main fetch function with automatic token refresh
-export async function authFetch(url, options = {}, logout) {
+export async function authFetch(url, options = {}) {
   let { access, refresh } = await getTokens();
   let response;
 
@@ -61,7 +62,6 @@ export async function authFetch(url, options = {}, logout) {
       options.headers.Authorization = `Bearer ${access}`;
       response = await fetch(`${Config.BACKEND_URL}${url}`, options);
     } catch (e) {
-      if (logout) await logout();
       await removeTokens();
       throw new Error('Session expired. Please log in again.');
     }

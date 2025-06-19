@@ -7,19 +7,31 @@ import {
   TouchableOpacity,
   Platform,
   Switch,
+  Button,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 import { authFetch } from "../../utils/api";
 import { setTimeToZero, formatDateTime } from "../../utils/dateHelpers";
 import DateSelector from "../DateSelector";
 import TimeSelector from "../TimeSelector";
+import CreateCategoryEventModal from "./CreateCategoryEventModal";
 import styles from "../../styles/common";
 
-export default function CreateEventModal({ visible, onClose, onEventCreated }) {
+export default function CreateEventModal({
+  visible,
+  onClose,
+  onEventCreated,
+  categories,
+  setCategories,
+  fetchCategories,
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [error, setError] = useState(null);
+
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
 
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDate, setShowStartDate] = useState(false);
@@ -38,14 +50,31 @@ export default function CreateEventModal({ visible, onClose, onEventCreated }) {
 
   const handleSubmit = async () => {
     setError(null);
+    if (!title.trim()) {
+      setError("Title is required.");
+      return;
+    }
+    if (!startDate || isNaN(startDate.getTime())) {
+      setError("Start date is required.");
+      return;
+    }
+    if (!category) {
+      setError("Category is required.");
+      return;
+    }
+
+    // Si no se añade hora, poner a las 00:00:00
+    let finalStartDate = showTime ? startDate : setTimeToZero(startDate);
+    let finalEndDate = showTime ? endDate : setTimeToZero(endDate);
+
     try {
       const data = await authFetch("/events/", {
         method: "POST",
         body: {
           title,
           description,
-          startDate: formatDateTime(startDate),
-          endDate: formatDateTime(endDate),
+          startDate: formatDateTime(finalStartDate),
+          endDate: formatDateTime(finalEndDate),
           category,
         },
       });
@@ -156,13 +185,25 @@ export default function CreateEventModal({ visible, onClose, onEventCreated }) {
 
           <View style={styles.field}>
             <Text style={styles.label}>Category</Text>
-            <TextInput
-              placeholder="Category"
-              value={category}
-              onChangeText={setCategory}
-              style={styles.input}
-              placeholderTextColor="#aaa"
-            />
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flex: 1 }}>
+                <Picker
+                  selectedValue={category}
+                  onValueChange={setCategory}
+                  style={{ backgroundColor: "#fff" }}
+                >
+                  <Picker.Item label="Select category" value="" />
+                  {categories.map((cat) => (
+                    <Picker.Item key={cat.id} label={cat.name} value={cat.id} />
+                  ))}
+                </Picker>
+              </View>
+              <Button
+                title="+"
+                onPress={() => setCategoryModalVisible(true)}
+                color="#1976d2"
+              />
+            </View>
           </View>
 
           {error && <Text style={styles.error}>{error}</Text>}
@@ -215,6 +256,12 @@ export default function CreateEventModal({ visible, onClose, onEventCreated }) {
               onChange={onChangeTime(setEndDate, setShowEndTime, endDate)}
             />
           )}
+
+          <CreateCategoryEventModal
+            visible={categoryModalVisible}
+            onClose={() => setCategoryModalVisible(false)}
+            onCategoryCreated={fetchCategories}
+          />
         </View>
       </View>
     </Modal>

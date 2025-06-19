@@ -3,14 +3,20 @@ import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { authFetch } from '../../utils/api';
 import { Calendar } from 'react-native-big-calendar';
 import CreateEventModal from '../../components/event/CreateEventModal';
+import CreateCategoryEventModal from '../../components/event/CreateCategoryEventModal';
 
 const CalendarScreen = () => {
   const [events, setEvents] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Categories state
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     fetchEvents();
+    fetchCategories();
   }, []);
 
   const fetchEvents = () => {
@@ -23,6 +29,14 @@ const CalendarScreen = () => {
         setEvents(data);
       })
       .catch(() => setEvents([]));
+  };
+
+  const fetchCategories = () => {
+    authFetch('/events/category/')
+      .then(data => {
+        setCategories(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setCategories([]));
   };
 
   const calendarEvents = events.map(event => ({
@@ -50,7 +64,11 @@ const CalendarScreen = () => {
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      <Button title="Create New Event" onPress={() => setModalVisible(true)} />
+      {/* Botones en fila */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+        <Button title="Create New Event" onPress={() => setModalVisible(true)} />
+        <Button title="Create New Category" onPress={() => setCategoryModalVisible(true)} />
+      </View>
 
       {/* Mes y flechas */}
       <View style={styles.header}>
@@ -76,6 +94,15 @@ const CalendarScreen = () => {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onEventCreated={fetchEvents}
+        categories={categories}
+        setCategories={setCategories}
+        fetchCategories={fetchCategories}
+      />
+
+      <CreateCategoryEventModal
+        visible={categoryModalVisible}
+        onClose={() => setCategoryModalVisible(false)}
+        onCategoryCreated={fetchCategories}
       />
     </View>
   );

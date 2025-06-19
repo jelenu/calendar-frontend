@@ -25,8 +25,9 @@ function AuthStackScreen() {
 function AppDrawerScreen() {
   return (
     <Drawer.Navigator>
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Calendar" component={CalendarScreen} />
+
+      <Drawer.Screen name="Profile" component={ProfileScreen} />
     </Drawer.Navigator>
   );
 }

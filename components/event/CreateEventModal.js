@@ -15,7 +15,7 @@ import { authFetch } from "../../utils/api";
 import { setTimeToZero, formatDateTime } from "../../utils/dateHelpers";
 import DateSelector from "../DateSelector";
 import TimeSelector from "../TimeSelector";
-import CreateCategoryEventModal from "./CreateCategoryEventModal";
+import CreateCategoryEventModal from "../category/CreateCategoryModal";
 import styles from "../../styles/common";
 
 export default function CreateEventModal({
@@ -63,7 +63,6 @@ export default function CreateEventModal({
       return;
     }
 
-    // Si no se añade hora, poner a las 00:00:00
     let finalStartDate = showTime ? startDate : setTimeToZero(startDate);
     let finalEndDate = showTime ? endDate : setTimeToZero(endDate);
 
@@ -116,7 +115,7 @@ export default function CreateEventModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>Create Event</Text>

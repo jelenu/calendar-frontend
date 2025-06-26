@@ -22,7 +22,7 @@ const calendarStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 6,
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   createEventButton: {
     backgroundColor: "#1976d2",
@@ -31,8 +31,7 @@ const calendarStyles = StyleSheet.create({
     paddingVertical: 6,
     flexDirection: "row",
     alignItems: "center",
-    elevation: 1,
-    flex: 1,
+
     justifyContent: "center",
     marginRight: 4,
     marginLeft: 0,
@@ -51,10 +50,8 @@ const calendarStyles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 6,
-    flex: 1,
     justifyContent: "center",
     marginHorizontal: 4,
-    elevation: 1,
   },
   createCategoryButtonText: {
     color: "#1976d2",
@@ -68,9 +65,7 @@ const calendarStyles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 6,
-    flex: 1,
     justifyContent: "center",
-    elevation: 1,
   },
   selectAllButtonText: {
     color: "#fff",

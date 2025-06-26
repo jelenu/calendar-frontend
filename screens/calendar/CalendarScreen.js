@@ -27,7 +27,6 @@ const CalendarScreen = () => {
     fetchCategories();
   }, []);
 
-  // Select all categories once fetched
   useEffect(() => {
     if (categories.length > 0) {
       setSelectedCategories(categories.map((cat) => cat.id));
@@ -54,7 +53,6 @@ const CalendarScreen = () => {
       .catch(() => setCategories([]));
   };
 
-  // Prepare calendar events filtered by selected categories
   const calendarEvents = events
     .filter((event) => selectedCategories.includes(event.category))
     .map((event) => {
@@ -70,7 +68,6 @@ const CalendarScreen = () => {
       };
     });
 
-  // Move calendar to next or previous month
   const updateMonth = (direction) => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() + direction);
@@ -79,7 +76,6 @@ const CalendarScreen = () => {
 
   const allSelected = selectedCategories.length === categories.length;
 
-  // Toggle category selection between all and none
   const toggleSelectAll = () => {
     if (allSelected) {
       setSelectedCategories([]);
@@ -90,20 +86,22 @@ const CalendarScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top action bar: Create Event, Create Category, Select All */}
+      {/* Top action bar: + Event, + Catego, Select All */}
       <View style={styles.mainActionsRow}>
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
           style={styles.createEventButton}
         >
-          <Text style={styles.createEventButtonText}>Create Event</Text>
+          <Feather name="plus" size={14} color="#fff" style={{ marginRight: 4 }} />
+          <Text style={styles.createEventButtonText}>Event</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => setCategoryModalVisible(true)}
           style={styles.createCategoryButton}
         >
-          <Text style={styles.createCategoryButtonText}>Create Category</Text>
+          <Feather name="plus" size={14} color="#1976d2" style={{ marginRight: 4 }} />
+          <Text style={styles.createCategoryButtonText}>Category</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

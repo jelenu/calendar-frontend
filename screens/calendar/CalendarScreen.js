@@ -84,6 +84,16 @@ const CalendarScreen = () => {
     }
   };
 
+  const handleEditCategory = () => {
+    fetchCategories();
+    fetchEvents();
+  };
+
+  const handleDeleteCategory = () => {
+    fetchCategories();
+    fetchEvents();
+  };
+
   return (
     <View style={styles.container}>
       {/* Top action bar: + Event, + Catego, Select All */}
@@ -119,6 +129,8 @@ const CalendarScreen = () => {
         categories={categories}
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
+        onEditCategory={handleEditCategory}
+        onDeleteCategory={handleDeleteCategory}
       />
 
       {/* Calendar month header with arrows */}

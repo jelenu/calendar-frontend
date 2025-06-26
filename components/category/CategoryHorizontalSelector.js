@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import CategoryEditModal from "./CategoryEditModal";
 import { authFetch } from "../../utils/api";
 import categoryHorizontalSelectorStyles from "../../styles/CategoryHorizontalSelectorStyles";
@@ -17,6 +16,7 @@ export default function CategoryHorizontalSelector({
   const [editColor, setEditColor] = useState("#1976d2");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Update modal form values when a category is selected for editing
   React.useEffect(() => {
@@ -24,6 +24,7 @@ export default function CategoryHorizontalSelector({
     setEditColor(actionCategory?.color || "#1976d2");
     setShowColorPicker(false);
     setEditing(false);
+    setDeleting(false);
   }, [actionCategory]);
 
   // Handle category update logic
@@ -38,11 +39,25 @@ export default function CategoryHorizontalSelector({
           color: editColor,
         },
       });
-      if (onEditCategory)
-        await onEditCategory(actionCategory, editName.trim(), editColor);
+      if (onEditCategory) onEditCategory();
       setActionCategory(null);
     } finally {
       setEditing(false);
+    }
+  };
+
+  // Handle category delete logic
+  const handleDelete = async () => {
+    if (!actionCategory) return;
+    setDeleting(true);
+    try {
+      await authFetch(`/events/category/${actionCategory.id}/`, {
+        method: "DELETE",
+      });
+      if (onDeleteCategory) onDeleteCategory();
+      setActionCategory(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -105,10 +120,8 @@ export default function CategoryHorizontalSelector({
         setShowColorPicker={setShowColorPicker}
         editing={editing}
         onEdit={handleEdit}
-        onDelete={() => {
-          setActionCategory(null);
-          if (onDeleteCategory) onDeleteCategory(actionCategory);
-        }}
+        onDelete={handleDelete}
+        deleting={deleting}
       />
     </View>
   );

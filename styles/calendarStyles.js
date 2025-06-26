@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 const calendarStyles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 8,
   },
   header: {
     flexDirection: 'row',

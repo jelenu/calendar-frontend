@@ -1,27 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
-import { authFetch } from '../../utils/api';
-import { Calendar } from 'react-native-big-calendar';
-import CreateEventModal from '../../components/event/CreateEventModal';
-import CreateCategoryEventModal from '../../components/event/CreateCategoryEventModal';
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { authFetch } from "../../utils/api";
+import { Calendar } from "react-native-big-calendar";
+import CreateEventModal from "../../components/event/CreateEventModal";
+import CreateCategoryEventModal from "../../components/category/CreateCategoryModal";
+import CategoryHorizontalSelector from "../../components/category/CategoryHorizontalSelector";
+import EventDetailModal from "../../components/event/EventDetailModal";
+import styles from "../../styles/calendarStyles";
+import categoryHorizontalSelectorStyles from "../../styles/CategoryHorizontalSelectorStyles";
+import { getFormattedMonth } from "../../utils/dateHelpers";
 
 const CalendarScreen = () => {
   const [events, setEvents] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [eventDetailModalVisible, setEventDetailModalVisible] = useState(false);
 
-  // Categories state
   const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   useEffect(() => {
     fetchEvents();
     fetchCategories();
   }, []);
 
+  // Select all categories once fetched
+  useEffect(() => {
+    if (categories.length > 0) {
+      setSelectedCategories(categories.map((cat) => cat.id));
+    }
+  }, [categories]);
+
   const fetchEvents = () => {
-    authFetch('/events/')
-      .then(data => {
+    authFetch("/events/")
+      .then((data) => {
         if (!data || !Array.isArray(data)) {
           setEvents([]);
           return;
@@ -32,45 +47,83 @@ const CalendarScreen = () => {
   };
 
   const fetchCategories = () => {
-    authFetch('/events/category/')
-      .then(data => {
+    authFetch("/events/category/")
+      .then((data) => {
         setCategories(Array.isArray(data) ? data : []);
       })
       .catch(() => setCategories([]));
   };
 
-  const calendarEvents = events.map(event => ({
-    title: event.title,
-    start: new Date(event.startDate),
-    end: new Date(event.endDate),
-    description: event.description,
-    id: event.id,
-  }));
+  // Prepare calendar events filtered by selected categories
+  const calendarEvents = events
+    .filter((event) => selectedCategories.includes(event.category))
+    .map((event) => {
+      const category = categories.find((cat) => cat.id === event.category);
+      return {
+        title: event.title,
+        start: new Date(event.startDate),
+        end: new Date(event.endDate),
+        description: event.description,
+        id: event.id,
+        category: category.name,
+        color: category?.color,
+      };
+    });
 
+  // Move calendar to next or previous month
   const updateMonth = (direction) => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() + direction);
     setCurrentDate(newDate);
   };
 
-  const getFormattedMonth = (date) => {
-    const formatter = new Intl.DateTimeFormat('es-ES', {
-      month: 'long',
-      year: 'numeric',
-    });
-    const formatted = formatter.format(date);
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  const allSelected = selectedCategories.length === categories.length;
+
+  // Toggle category selection between all and none
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedCategories([]);
+    } else {
+      setSelectedCategories(categories.map((cat) => cat.id));
+    }
   };
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      {/* Botones en fila */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-        <Button title="Create New Event" onPress={() => setModalVisible(true)} />
-        <Button title="Create New Category" onPress={() => setCategoryModalVisible(true)} />
+    <View style={styles.container}>
+      {/* Top action bar: Create Event, Create Category, Select All */}
+      <View style={styles.mainActionsRow}>
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.createEventButton}
+        >
+          <Text style={styles.createEventButtonText}>Create Event</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setCategoryModalVisible(true)}
+          style={styles.createCategoryButton}
+        >
+          <Text style={styles.createCategoryButtonText}>Create Category</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={toggleSelectAll}
+          style={styles.selectAllButton}
+        >
+          <Text style={styles.selectAllButtonText}>
+            {allSelected ? "Deselect Categories" : "Select Categories"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Mes y flechas */}
+      {/* Horizontal category selector */}
+      <CategoryHorizontalSelector
+        categories={categories}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+      />
+
+      {/* Calendar month header with arrows */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => updateMonth(-1)}>
           <Text style={styles.arrow}>←</Text>
@@ -81,15 +134,24 @@ const CalendarScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={{ flex: 1, marginTop: 8 }}>
+      {/* Main calendar view */}
+      <View style={{ flex: 1, marginTop: 4 }}>
         <Calendar
           events={calendarEvents}
           mode="month"
           date={currentDate}
           swipeEnabled={false}
+          eventCellStyle={(event) => ({
+            backgroundColor: event.color,
+          })}
+          onPressEvent={(event) => {
+            setSelectedEvent(event);
+            setEventDetailModalVisible(true);
+          }}
         />
       </View>
 
+      {/* Modals */}
       <CreateEventModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -104,25 +166,14 @@ const CalendarScreen = () => {
         onClose={() => setCategoryModalVisible(false)}
         onCategoryCreated={fetchCategories}
       />
+
+      <EventDetailModal
+        visible={eventDetailModalVisible}
+        onClose={() => setEventDetailModalVisible(false)}
+        event={selectedEvent}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 12,
-  },
-  monthText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  arrow: {
-    fontSize: 28,
-    paddingHorizontal: 16,
-  },
-});
 
 export default CalendarScreen;

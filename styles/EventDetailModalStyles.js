@@ -1,0 +1,171 @@
+import { StyleSheet } from "react-native";
+
+
+const eventDetailModalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 18,
+    width: 320,
+    alignItems: 'center',
+    elevation: 8,
+    position: 'relative',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    padding: 6,
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 10,
+    color: "#222",
+  },
+  field: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    color: "#1976d2",
+    marginBottom: 2,
+    fontSize: 13,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    fontSize: 15,
+    backgroundColor: '#fafbfc',
+    color: "#222",
+    width: "100%",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 8,
+  },
+  categoryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 2,
+    alignSelf: "flex-start",
+  },
+  categoryColor: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  categoryText: {
+    fontWeight: "bold",
+    color: "#1976d2",
+    fontSize: 14,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 10,
+  },
+  button: {
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  saveButton: {
+    backgroundColor: "#1976d2",
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  deleteButton: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e53935",
+  },
+  deleteButtonText: {
+    color: "#e53935",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  // Confirm delete modal
+  confirmModal: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 18,
+    width: 320,
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+  confirmText: {
+    fontWeight: 'bold',
+    fontSize: 17,
+    marginBottom: 16,
+    textAlign: 'center',
+    color: "#e53935",
+  },
+  confirmButtonRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    width: "100%",
+    justifyContent: "space-between",
+  },
+  cancelButton: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    marginRight: 10,
+    flex: 1,
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  confirmDeleteButton: {
+    backgroundColor: '#e53935',
+    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: "center",
+  },
+  confirmDeleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+});
+
+export default eventDetailModalStyles;

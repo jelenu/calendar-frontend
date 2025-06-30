@@ -12,27 +12,36 @@ import categoryHorizontalSelectorStyles from "../../styles/CategoryHorizontalSel
 import { getFormattedMonth } from "../../utils/dateHelpers";
 
 const CalendarScreen = () => {
+  // State for all events
   const [events, setEvents] = useState([]);
+
+  // State for modals
   const [modalVisible, setModalVisible] = useState(false);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventDetailModalVisible, setEventDetailModalVisible] = useState(false);
 
+  // Date and selection state
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Categories state
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
+  // Fetch events and categories on component mount
   useEffect(() => {
     fetchEvents();
     fetchCategories();
   }, []);
 
+  // Select all categories by default once they're loaded
   useEffect(() => {
     if (categories.length > 0) {
       setSelectedCategories(categories.map((cat) => cat.id));
     }
   }, [categories]);
 
+  // Fetch events from API
   const fetchEvents = () => {
     authFetch("/events/")
       .then((data) => {
@@ -42,17 +51,19 @@ const CalendarScreen = () => {
         }
         setEvents(data);
       })
-      .catch(() => setEvents([]));
+      .catch(() => setEvents([])); // In case of error, reset events
   };
 
+  // Fetch categories from API
   const fetchCategories = () => {
     authFetch("/events/category/")
       .then((data) => {
         setCategories(Array.isArray(data) ? data : []);
       })
-      .catch(() => setCategories([]));
+      .catch(() => setCategories([])); // In case of error, reset categories
   };
 
+  // Prepare calendar-compatible event objects
   const calendarEvents = events
     .filter((event) => selectedCategories.includes(event.category))
     .map((event) => {
@@ -68,14 +79,17 @@ const CalendarScreen = () => {
       };
     });
 
+  // Navigate calendar month forward or backward
   const updateMonth = (direction) => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() + direction);
     setCurrentDate(newDate);
   };
 
+  // Check if all categories are selected
   const allSelected = selectedCategories.length === categories.length;
 
+  // Toggle category selection: all or none
   const toggleSelectAll = () => {
     if (allSelected) {
       setSelectedCategories([]);
@@ -84,11 +98,13 @@ const CalendarScreen = () => {
     }
   };
 
+  // Callback after editing a category
   const handleEditCategory = () => {
     fetchCategories();
     fetchEvents();
   };
 
+  // Callback after deleting a category
   const handleDeleteCategory = () => {
     fetchCategories();
     fetchEvents();
@@ -96,7 +112,7 @@ const CalendarScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top action bar: + Event, + Catego, Select All */}
+      {/* Top action bar with buttons to create event, category, or toggle categories */}
       <View style={styles.mainActionsRow}>
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
@@ -124,7 +140,7 @@ const CalendarScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Horizontal category selector */}
+      {/* Horizontal scroll selector for categories */}
       <CategoryHorizontalSelector
         categories={categories}
         selectedCategories={selectedCategories}
@@ -133,7 +149,7 @@ const CalendarScreen = () => {
         onDeleteCategory={handleDeleteCategory}
       />
 
-      {/* Calendar month header with arrows */}
+      {/* Header showing current month with navigation arrows */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => updateMonth(-1)}>
           <Text style={styles.arrow}>←</Text>
@@ -144,7 +160,7 @@ const CalendarScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Main calendar view */}
+      {/* Main calendar component */}
       <View style={{ flex: 1, marginTop: 4 }}>
         <Calendar
           events={calendarEvents}
@@ -161,7 +177,7 @@ const CalendarScreen = () => {
         />
       </View>
 
-      {/* Modals */}
+      {/* Modal to create a new event */}
       <CreateEventModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -171,16 +187,22 @@ const CalendarScreen = () => {
         fetchCategories={fetchCategories}
       />
 
+      {/* Modal to create a new category */}
       <CreateCategoryEventModal
         visible={categoryModalVisible}
         onClose={() => setCategoryModalVisible(false)}
         onCategoryCreated={fetchCategories}
       />
 
+      {/* Modal to show event details */}
       <EventDetailModal
         visible={eventDetailModalVisible}
         onClose={() => setEventDetailModalVisible(false)}
         event={selectedEvent}
+        categories={categories}
+        fetchCategories={fetchCategories}
+        onDelete={fetchEvents}
+        onUpdate={fetchEvents}
       />
     </View>
   );

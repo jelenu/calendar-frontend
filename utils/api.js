@@ -73,6 +73,15 @@ export async function authFetch(url, options = {}) {
   if (!response.ok) {
     // Try to get error message from response
     console.log('API Error:', data);
+    
+    if (data && typeof data === 'object') {
+
+      const error = new Error('API Error');
+      error.data = data;
+      error.status = response.status;
+      throw error;
+    }
+    
     const errorMsg =
       data?.detail ||
       data?.message ||
